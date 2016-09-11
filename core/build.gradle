@@ -1,0 +1,30 @@
+apply plugin: "java"
+apply plugin: 'kotlin'
+
+sourceCompatibility = 1.6
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+
+
+eclipse.project {
+    name = appName + "-core"
+}
+buildscript {
+    ext.kotlin_version = '1.0.0-rc-1036'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+repositories {
+    mavenCentral()
+}
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
