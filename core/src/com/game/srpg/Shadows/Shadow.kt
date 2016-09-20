@@ -124,10 +124,12 @@ class Shadow(val assets : AssetWrapper, val camera : Camera) : Disposable{
             textureShaderProgram.setUniformf("u_height", height)
             textureShaderProgram.end()
 
+            val li = lights.first()
             colorShaderProgram.begin()
             colorShaderProgram.setUniformi("u_shadows", texIndex)
             colorShaderProgram.setUniformf("u_width", width)
             colorShaderProgram.setUniformf("u_height", height)
+            colorShaderProgram.setUniformf("u_lightPos", li.position.x, li.position.y, li.position.z)
             colorShaderProgram.end()
 
 
