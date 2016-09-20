@@ -19,13 +19,14 @@ class SelectAction(val cursor : Cursor, val unit : GameUnit, val previous : Curs
     val ui = cursor.parent.screen.ui
 
     val coords = cursor.parent.screen.camera.project(Vector3(x, 0f, y))
-    val list = ActionList(skin, unit, cursor, this, coords.x + 70, coords.y)
+    internal lateinit var list : ActionList
 
     init{
 
     }
 
     override fun onEnter() {
+        list = ActionList(skin, unit, cursor, this, coords.x + 70, coords.y)
         cursor.moveCommand(cursor.mapX(), cursor.mapY(), unit.mapX(), unit.mapY())
         cursor.x = unit.x
         cursor.y = unit.y

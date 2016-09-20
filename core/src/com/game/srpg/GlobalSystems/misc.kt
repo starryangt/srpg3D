@@ -61,6 +61,26 @@ class BackAndForth : Interpolation(){
     }
 }
 
+class Wobble : Interpolation(){
+    override fun apply(a: Float): Float {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun apply(start: Float, end: Float, a: Float): Float {
+        val wiggleRoom = 0.1f * Math.abs(start - end)
+        val firstInterop = Interpolation.exp5
+        val secondInterop = Interpolation.circleIn
+        when{
+            a < .1f -> { firstInterop.apply(start, start + wiggleRoom, a * 10)}
+            a < .2f -> { firstInterop.apply(start + wiggleRoom, start, a * 10 - 1)}
+            a < .3f -> { firstInterop.apply(start, start - wiggleRoom, a * 10 - 2)}
+            a < .4f -> {}
+            else -> {}
+        }
+        return 1f
+    }
+}
+
 class Interop{
     companion object static{
         val ActualLerp = com.game.srpg.GlobalSystems.ActualLerp()

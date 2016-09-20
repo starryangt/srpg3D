@@ -31,6 +31,7 @@ void main()
     vec4 color = texture2D(u_tileMap, vec2(x, y));
     //vec4 color = texture2D(u_tileMap, v_tex);
 	vec4 finalColor  = vec4(0, 0, 0, u_alpha);
+	/*
     if(color.g > 0.5){
         finalColor.rgb = u_position;
     }
@@ -41,8 +42,14 @@ void main()
         finalColor.rgb = u_ally;
     }
     else{
-        discard;
+        finalColor.a = 0;
     }
+    */
+    finalColor.rgb += u_position * color.g;
+    finalColor.rgb += u_attack * color.b;
+    finalColor.rgb += u_ally * color.r;
+    finalColor.a = (color.g + color.r + color.b) * u_alpha;
+
 	//finalColor.rgb = u_color.rgb;
 	//finalColor.a = u_alpha;
 	//finalColor.rgb   = finalColor.rgb*v_intensity;

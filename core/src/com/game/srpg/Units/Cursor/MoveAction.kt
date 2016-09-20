@@ -1,6 +1,8 @@
 package com.game.srpg.Units.Cursor
 
 import com.badlogic.gdx.math.Vector2
+import com.game.srpg.AI.Action.AIMove
+import com.game.srpg.GlobalSystems.Globals
 import com.game.srpg.Units.Controller.PathAnimationController
 import com.game.srpg.Units.Controller.UnitWorldController
 import com.game.srpg.Units.GameUnit
@@ -19,15 +21,20 @@ class MoveAction(val cursor : Cursor, val unit : GameUnit) : ImplementedCursorAc
     val oldX = unit.mapX()
     val oldY = unit.mapY()
 
+    var moving = false
+
     override fun onEnter() {
         unit.x = oldX
         unit.y = oldY
         movableRegion = cursor.parent.path.movableRegion(hold.mapX(), hold.mapY(), unit.stats.current.move)
         cursor.parent.playerHighlight.setPath(movableRegion)
-        unit.drawing.requestState("up")
-
-        //cursor.disable = true
+        unit.drawing.requestState("down")
     }
+
+    override fun onExit() {
+        unit.drawing.requestState("idle")
+    }
+
 
     override fun update(dt : Float){
         if(unit.controllers.peekFirst().isDone()){
@@ -36,7 +43,7 @@ class MoveAction(val cursor : Cursor, val unit : GameUnit) : ImplementedCursorAc
     }
 
     override fun activate() {
-        if(isReleasable()){
+        if(isReleasable() && !moving){
             releaseX = cursor.x
             releaseY = cursor.y
             if(releaseX == unit.x && releaseY == unit.y){
@@ -63,13 +70,15 @@ class MoveAction(val cursor : Cursor, val unit : GameUnit) : ImplementedCursorAc
         unit.x = releaseX
         unit.y = releaseY
         cursor.switch(SelectAction(cursor, unit, this))
+        moving = false
     }
 
     fun startAnimation(x : Int, y : Int){
         val path = cursor.parent.path.pathfind(unit.mapX(), unit.mapY(), x, y)
-        val animation = PathAnimationController(path, unit.drawing, cursor.parent, 0.1f)
+        val animation = PathAnimationController(path, unit.drawing, cursor.parent, Globals.UnitMoveTime)
         animation.doneCallback { releaseUnit() }
-        unit.controllers.addFirst(animation)
+        unit.addController(animation)
+        moving = true
     }
 
     override fun cancel() {

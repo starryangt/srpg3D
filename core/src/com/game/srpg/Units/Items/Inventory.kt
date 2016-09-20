@@ -20,13 +20,25 @@ class Inventory{
     }
 
     fun equip(item : Item){
-
+        val index = items.indexOf(item)
+        if(index != -1){
+            equip(index)
+        }
     }
 
     fun equip(index : Int){
         val item = items.get(index)
         if (item != null){
             equipped = item
+            if(index != 0) {
+                println("$index, $item")
+                items.removeIndex(index)
+                items.insert(0, item)
+            }
         }
+    }
+
+    fun unequip(){
+        equipped = null
     }
 }

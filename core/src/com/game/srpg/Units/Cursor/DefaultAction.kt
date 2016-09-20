@@ -15,12 +15,12 @@ class DefaultAction(val cursor : Cursor) : ImplementedCursorAction(){
     var stat : StatBox? = null
 
     override fun onEnter() {
-        if(!playerHighlight()){
-            val highlight = cursor.parent.playerHighlight
-            highlight.begin()
-            highlight.colorTile(cursor.mapX(), cursor.mapY())
-            highlight.end()
-        }
+        //if(!playerHighlight()){
+            //val highlight = cursor.parent.playerHighlight
+            //highlight.begin()
+            //highlight.colorTile(cursor.mapX(), cursor.mapY())
+            //highlight.end()
+        //}
     }
 
     override fun onExit() {
@@ -37,7 +37,7 @@ class DefaultAction(val cursor : Cursor) : ImplementedCursorAction(){
 
     override fun activate() {
         val unit = cursor.parent.getUnit(cursor.mapX(), cursor.mapY())
-        if(unit != null && unit.unitClass.type == UnitType.ALLY){
+        if(unit != null && unit.unitClass.type == UnitType.ALLY && !unit.dead && unit.enabled){
             cursor.switch(MoveAction(cursor, unit))
         }
     }
@@ -59,7 +59,6 @@ class DefaultAction(val cursor : Cursor) : ImplementedCursorAction(){
                     highlight.colorTile(pair.key, pair.value)
                 }
                 highlight.end()
-
             }
 
             else{

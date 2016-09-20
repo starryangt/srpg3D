@@ -190,7 +190,7 @@ class PathMap(width : Int, height : Int, val units :
 
     fun isType(index : Int, type : UnitType) : Boolean{
         val unit = getUnit(index)
-        if(unit != null){
+        if(unit != null && !unit.dead){
             return unit.unitClass.type == type
         }
         return false
@@ -232,6 +232,25 @@ class PathMap(width : Int, height : Int, val units :
         return attack
     }
 
+    fun totalAttackRegion(map : GameMap, ally : UnitType = UnitType.ENEMY) : IntMap<Boolean>{
+        val totalRegion = IntMap<Boolean>()
+        val iterator = com.badlogic.gdx.utils.Array.ArrayIterable(units)
+        for(unit in iterator){
+            if(unit.unitClass.type == ally){
+                val region = movableRegion(unit.mapX(), unit.mapY(), unit.stats.current.move)
+                totalRegion.put(pointToIndex(unit.mapX(), unit.mapY()), true)
+                val weapon = unit.inventory.equipped
+                if(weapon is Item.Weapon){
+                    val attackRegion = attackRegion(map, region, unit.unitClass.type, weapon)
+                    for(tile in attackRegion){
+                        totalRegion.put(tile.key, true)
+                    }
+                }
+            }
+        }
+        return totalRegion
+    }
+
     fun movableRegion(x : Int, y : Int, cost : Int) : ArrayList<Int>{
         return movableRegion(costMap.pointToIndex(x,y), cost)
     }
@@ -257,6 +276,7 @@ class PathMap(width : Int, height : Int, val units :
             iter++
             if(iter > maxiter){
                 println("Mercy Killed")
+                println("$cost")
                 break
             }
 

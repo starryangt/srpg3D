@@ -29,6 +29,7 @@ import com.game.srpg.Combat.Combat
 import com.game.srpg.GlobalSystems.*
 import com.game.srpg.Map.GameMap
 import com.game.srpg.Map.HighlightAttribute
+import com.game.srpg.Map.MapHighlight
 import com.game.srpg.Map.Phase.EnemyPhase
 import com.game.srpg.Map.TempHighlightAttribute
 import com.game.srpg.Shaders.MapHighlightShader
@@ -37,7 +38,7 @@ import com.game.srpg.Shadows.PointLight
 import com.game.srpg.Shadows.Shadow
 import com.game.srpg.Shadows.SimpleColorShader
 import com.game.srpg.UI.*
-import com.game.srpg.Units.Controller.CursorCameraController
+import com.game.srpg.Units.Controller.UnitCameraFollower
 import com.game.srpg.Units.GameUnit
 import com.game.srpg.Units.UnitFactory
 
@@ -45,7 +46,7 @@ import com.game.srpg.Units.UnitFactory
  * Created by FlyingJam on 8/18/2016.
  */
 
-class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter(){
+class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter() {
 
 
     var width = Gdx.graphics.width
@@ -56,7 +57,6 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter(){
     val ui = UI(skin)
     val map = GameMap(32, 32, 32, 32, assets, ui, this)
     val shadow = Shadow(assets, camera)
-    val cursorController = CursorCameraController(map.cursor, camera, width, height)
 
     val spotlight = DirectionalLight(assets.assetManager, Vector3(0f, 300f, 300f), Vector3(0f, 0f, 0f))
 
@@ -67,21 +67,31 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter(){
 
     val fps = FpsDrawer()
 
-    val batch = ModelBatch(object : DefaultShaderProvider(){
+    val batch = ModelBatch(object : DefaultShaderProvider() {
         override fun createShader(renderable: Renderable): Shader {
-            if(renderable.material.has(HighlightAttribute.Highlight)){
-                return MapHighlightShader(renderable, map.playerHighlight)
+            if (renderable.material.has(HighlightAttribute.Highlight)) {
+                val highlight = renderable.userData as MapHighlight
+                println("once!")
+                return MapHighlightShader(renderable, highlight)
             }
             return SimpleColorShader(renderable, program)
         }
     })
 
+    val normalBatch = ModelBatch()
+
+    val model = assets.assetManager.get("tree.g3dj", Model::class.java)
+    val instance = ModelInstance(model)
+
     val button = Button(skin)
     val action = MoveToAction()
-    init{
+
+    init {
+        instance.transform.translate(64f, 0f, 0f)
+        //instance.transform()
     }
 
-    fun spawnFriendlyStat(unit : GameUnit){
+    fun spawnFriendlyStat(unit: GameUnit) {
         val table = StatBox(unit, skin)
         val action = MoveToAction()
         action.setPosition(table.table.x, table.table.y)
@@ -91,7 +101,7 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter(){
         table.table.addAction(action)
     }
 
-    init{
+    init {
         camera.translate(0f, 200f, 30f)
         camera.rotate(Vector3(5f, 0f, 0f), -40f)
         camera.far = 1500f
@@ -114,18 +124,36 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter(){
         shadow.addLight(spotlight)
     }
 
-    override fun render(delta: Float) {
-
-        glClear()
-        map.update(delta)
-        cursorController.update(delta)
+    fun fixedUpdate(){
         shadow.forceUpdate()
+    }
+
+    var acc = 0f
+    val targetTime = 1/60f
+    override fun render(delta: Float) {
+        glClear()
+
+        acc += delta
+        if(acc >= targetTime){
+            fixedUpdate()
+            acc -= targetTime
+        }
+
+        map.update(delta)
+        //shadow.forceUpdate()
         ui.update(delta)
 
-        shadow.render {it.render(map.shadowedRenderables); }
+        shadow.render {
+            it.render(map.shadowedRenderables)
+            it.render(instance)
+            //it.render(instance) }
+        }
 
         batch.begin(camera)
-        batch.render(map.playerHighlight.highlightInstance)
+        batch.render(map.playerHighlight)
+        //batch.render(map.totalEnemyHighlight)
+        batch.render(map.particleSystem)
+        //batch.render(instance)
         batch.end()
 
         ui.render(delta)
@@ -133,6 +161,5 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter(){
 
         camera.update()
         controller.update()
-
     }
 }

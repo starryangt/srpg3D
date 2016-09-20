@@ -16,6 +16,7 @@ class EndAction(cursor : Cursor, unit : GameUnit, previous : CursorAction) : Sel
         unit.disable()
         cursor.switch(DefaultAction(cursor))
         val phase = cursor.parent.phase
+        unit.drawing.requestState("idle")
         if(phase is PlayerPhase){
             phase.disabled()
         }

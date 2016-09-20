@@ -2,8 +2,12 @@ package com.game.srpg.Map
 
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.*
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.MathUtils
 //import com.badlogic.gdx.utils.Array
@@ -21,18 +25,23 @@ val attackColor = Color(0f, 0f, 1f, 1f)
 val allyColor = Color(1f, 0f, 0f, 1f)
 val blankColor = Color(0f, 0f, 0f, 0f)
 
+var count = 0
+
 class MapHighlight(val assetManager: AssetManager,
                    val map : GameMap,
                    var beginOpacity : Float = 0.3f,
                    var maxOpacity : Float = 0.7f,
-                   var length : Float = 1.5f
-                   ) : Disposable{
+                   var length : Float = 1.5f,
+                   var colorSet : ColorSet = ColorSet(Color.CYAN, Color.CHARTREUSE, Color.CORAL)
+                   ) : Disposable, RenderableProvider{
 
     enum class Type { POSITION, ATTACK, ALLY }
 
+    data class ColorSet(var position : Color, var attack : Color, var ally : Color)
+
     private var highlightPixmap = createSelectTexture(ArrayList<Int>(), map)
     private var highlightTexture = Texture(highlightPixmap)
-    private val highlightMesh = createMapColor(map.width, map.height, map.tileWidth, map.tileHeight)
+    private val highlightMesh = initMapModel()//createMapColor(map.width, map.height, map.tileWidth, map.tileHeight)
     val highlightInstance = ModelInstance(highlightMesh)
 
     val program = assetManager.get("tile_c", ShaderProgram::class.java)
@@ -46,7 +55,7 @@ class MapHighlight(val assetManager: AssetManager,
 
     var timeAccumulator = 0f
 
-    var opacity = 0f;
+    var opacity = 0f
     var goingUp = true
 
     fun update(dt : Float){
@@ -72,9 +81,29 @@ class MapHighlight(val assetManager: AssetManager,
         program.end()
     }
 
-
     fun setPath(path : Array<Int>, type : Type = Type.POSITION){
         //setSelectTexture()
+    }
+
+    fun initMapModel() : Model{
+        val builder = ModelBuilder()
+        val mat = Material(
+                BlendingAttribute(true, 0.5f),
+                HighlightAttribute(colorSet.position, colorSet.attack, colorSet.ally)
+        )
+        builder.begin()
+        val partBuilder = builder.part("color", GL20.GL_TRIANGLES,
+            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong(),
+            mat)
+        for(y in 0..map.height-1){
+            for(x in 0..map.width-1){
+                val realX = x * map.tileWidth.toFloat()
+                val realY = -y * map.tileHeight.toFloat()
+                partBuilder.box(realX, -3f, realY, map.tileWidth.toFloat(), 0f, map.tileHeight.toFloat())
+            }
+        }
+        val model = builder.end()
+        return model
     }
 
     fun begin(){
@@ -83,8 +112,9 @@ class MapHighlight(val assetManager: AssetManager,
     }
 
     fun end(){
-        highlightTexture.dispose()
-        highlightTexture = Texture(highlightPixmap)
+        //highlightTexture.dispose()
+        highlightTexture.draw(highlightPixmap, 0, 0)
+        //highlightTexture = Texture(highlightPixmap)
     }
 
     fun colorPath(path : Array<Int>, type : Type = Type.POSITION){
@@ -144,5 +174,12 @@ class MapHighlight(val assetManager: AssetManager,
         highlightPixmap.dispose()
         highlightTexture.dispose()
         highlightMesh.dispose()
+    }
+
+    override fun getRenderables(renderables: com.badlogic.gdx.utils.Array<Renderable>, pool: Pool<Renderable>) {
+        val renderable = pool.obtain()
+        highlightInstance.getRenderable(renderable)
+        renderable.userData = this
+        renderables.add(renderable)
     }
 }

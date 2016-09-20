@@ -2,6 +2,8 @@ package com.game.srpg.Units.Cursor
 
 import com.game.srpg.Combat.AttackInstance
 import com.game.srpg.GlobalSystems.AttackProcess
+import com.game.srpg.GlobalSystems.DeathProcess
+import com.game.srpg.GlobalSystems.Globals
 import com.game.srpg.GlobalSystems.ParallelStartEnd
 import com.game.srpg.UI.CombatBox
 import com.game.srpg.UI.HealthChange
@@ -21,16 +23,44 @@ class FastAttackAnimationAction(
         var currentInstance : AttackInstance) : ImplementedCursorAction(){
 
         val attack = AttackProcess(cursor.parent, unit, enemy)
+        var death  : DeathProcess? = null
         init{
             //attack.doneCallback { attack.end(); cursor.switch(EndAction(cursor, unit, this)) }
+            attack.doneCallback{
+                attack.end()
+                val deadUnit = attack.deadUnits()
+                if(deadUnit != null){
+                    val dead = DeathProcess(deadUnit, Globals.DeathFadeTime)
+                    dead.end.add { cursor.switch(EndAction(cursor, unit, this)) }
+                    death = dead
+                }
+                else{
+                    cursor.switch(EndAction(cursor, unit, this))
+                }
+            }
         }
 
+    override fun onEnter() {
+        cursor.parent.playerHighlight.begin()
+        cursor.parent.playerHighlight.end()
+    }
+
         override fun update(dt: Float) {
+            if(!attack.hasEnded())
                 attack.update(dt)
-                if(attack.hasEnded()){
-                        attack.end()
-                        cursor.switch(EndAction(cursor, unit, this))
-                }
+            death?.update(dt)
+            /*
+            if(attack.hasEnded() && !(death?.hasEnded() ?: false)){
+                attack.end()
+
+                cursor.switch(EndAction(cursor, unit, this))
+                //val dead = DeathProcess(enemy, 0.4f)
+                //dead.end.add { cursor.switch(EndAction(cursor, unit, this)) }
+            }
+            if(death?.hasEnded() ?: false){
+                //cursor.switch(EndAction(cursor, unit, this))
+            }
+            */
         }
     /*
     init{

@@ -18,20 +18,23 @@ import javafx.scene.effect.Blend
  */
 
 val maxDrawable = 50
-val maxVertices = maxDrawable * 8
-val maxIndices = maxDrawable * 12
+val maxVertices = maxDrawable * 10
+val maxIndices = maxDrawable * 14
 
 class CardBatch(texture : Texture) : RenderableProvider, Disposable {
 
+    val testAtr = VertexAttribute(VertexAttributes.Usage.ColorUnpacked, 4, "a_color")
+
     val mesh = Mesh(false, maxVertices, maxIndices, VertexAttribute.Position(),
-            VertexAttribute.Normal(), VertexAttribute.TexCoords(0))
+            VertexAttribute.Normal(), VertexAttribute.TexCoords(0), testAtr)
 
     val builder = MeshBuilder()
     val cards = ObjectSet<Card>()
     val renderable = Renderable()
     var mat = Material(
             TextureAttribute.createDiffuse(texture),
-            BlendingAttribute(false, 1f))
+            BlendingAttribute())
+            //BlendingAttribute(false, 1f))
 
     init{
         renderable.material = mat

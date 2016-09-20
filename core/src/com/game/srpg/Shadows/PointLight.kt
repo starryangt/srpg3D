@@ -9,22 +9,21 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector3
+import com.game.srpg.GlobalSystems.Globals
 
 /**
  * Created by FlyingJam on 8/5/2016.
  */
 
-class PointLight(assetManager: AssetManager, position : Vector3) : SLight(assetManager){
+class PointLight(assetManager: AssetManager, position : Vector3) : ShLight(assetManager){
 
     init{
         this.position = position
         init()
     }
 
-    val frameBuffer = FrameBufferCubeMap(Pixmap.Format.RGBA8888, shadowQuality, true)
+    val frameBuffer = FrameBufferCubeMap(Pixmap.Format.RGBA8888, Globals.Shadow.ShadowMapWidth, true)
     var depthMap : Cubemap? = null
-
-
 
     override fun applyToShader(sceneShader: ShaderProgram) {
         //sceneShader.begin()
@@ -44,9 +43,12 @@ class PointLight(assetManager: AssetManager, position : Vector3) : SLight(assetM
 
     override fun init() {
         super.init()
-        camera = PerspectiveCamera(90f, 1024f, 1024f)
+        camera = PerspectiveCamera(
+                Globals.Shadow.LightPointDefaultFOV,
+                Globals.Shadow.LightCameraWidth,
+                Globals.Shadow.LightCameraHeight)
         camera.near = 1f
-        camera.far = this.lightPower
+        camera.far = Globals.Shadow.LightDefaultFar
         camera.position.set(position)
         camera.update()
     }

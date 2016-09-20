@@ -13,6 +13,7 @@ import com.game.srpg.Map.GameMap
 class PlayerStartPhase(map : GameMap) : Phase(map){
 
     internal lateinit var label : Label
+
     override fun onEnter() {
         label = Label("Player Phase", parent.ui.skin)
         label.x = 600f

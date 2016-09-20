@@ -31,6 +31,24 @@ abstract class ChainableAction(vararg action : AIAction) : AIAction(){
 
 }
 
+class NothingAction() : AIAction(){
+    override fun begin(unit: GameUnit, map: GameMap) {
+    }
+
+    override fun end(unit: GameUnit, map: GameMap) {
+    }
+
+    override fun calculateValue(): Float {
+        return 0f
+    }
+
+    override fun update(dt: Float) {
+    }
+
+    override fun hasEnded(): Boolean {
+        return true
+    }
+}
 class SequenceAction(val unit : GameUnit, val map : GameMap, vararg action : AIAction) : AIAction(){
 
     val actions = Queue<AIAction>()
@@ -72,10 +90,4 @@ class SequenceAction(val unit : GameUnit, val map : GameMap, vararg action : AIA
         return actions.fold(0f) {r : Float , current -> r + current.calculateValue()}
     }
 }
-class AIFactors{
-    companion object static{
-        val Kill = 70
-        val PerDamage = 2f
-        val PerUnitMoved = 1f
-    }
-}
+

@@ -27,11 +27,12 @@ import java.util.*
 class Shadow(val assets : AssetWrapper, val camera : Camera) : Disposable{
 
     val assetManager = assets.assetManager
-    var lights = ArrayList<SLight>()
+    var lights = ArrayList<ShLight>()
     var renderCall : ((ModelBatch) -> Unit)? = null
 
     val textureShaderProgram = assetManager.get("shadowed_scene_t", ShaderProgram::class.java)
     val colorShaderProgram = assetManager.get("shadowed_scene_c", ShaderProgram::class.java)
+    val vertexColorShaderProgram = assetManager.get("shadowed_scene_vc", ShaderProgram::class.java)
     val shadowShaderProgram = assetManager.get("shadow_c", ShaderProgram::class.java)
     val textureShadowShaderProgram = assetManager.get("shadow_t", ShaderProgram::class.java)
 
@@ -43,12 +44,15 @@ class Shadow(val assets : AssetWrapper, val camera : Camera) : Disposable{
 
     val modelBatchNormal = ModelBatch(object : DefaultShaderProvider(){
         override fun createShader(renderable : Renderable) : Shader {
-            if(renderable.material.has(TextureAttribute.Diffuse))
+            if(renderable.material.has(TextureAttribute.Diffuse)) {
                 return SimpleTextureShader(renderable, textureShaderProgram)
-            else if (renderable.material.has(ColorAttribute.Diffuse))
+            }
+            else if (renderable.material.has(ColorAttribute.Diffuse)) {
                 return SimpleColorShader(renderable, colorShaderProgram)
-            else
+            }
+            else {
                 return super.createShader(renderable)
+            }
         }
     })
 
@@ -74,7 +78,7 @@ class Shadow(val assets : AssetWrapper, val camera : Camera) : Disposable{
         }
     }
 
-    fun addLight(vararg l : SLight){
+    fun addLight(vararg l : ShLight){
         for(light in l){
             lights.add(light)
         }

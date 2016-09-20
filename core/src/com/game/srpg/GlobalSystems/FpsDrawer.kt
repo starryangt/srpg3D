@@ -11,10 +11,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 class FpsDrawer(){
     val batch = SpriteBatch()
     val font = BitmapFont()
+    val builder = StringBuilder()
 
     fun draw(){
         val fps = Gdx.graphics.framesPerSecond
-
         batch.begin()
         font.draw(batch, "FPS: $fps", 0f, 50f)
         batch.end()

@@ -21,13 +21,13 @@ class EnemyPhase(map : GameMap) : Phase(map){
     }
 
     override fun update(dt: Float) {
-
         val iter = enemyIter
         currentActions.update(dt)
         if(iter.hasNext() && currentActions.hasEnded()){
             currentActions.end(currentEnemy, parent)
             currentEnemy.disable()
             currentEnemy = iter.next()
+            parent.camController.unit = currentEnemy
             currentActions = generateAIActions(currentEnemy)
             currentActions.begin(currentEnemy, parent)
         }
@@ -39,13 +39,14 @@ class EnemyPhase(map : GameMap) : Phase(map){
     }
 
     fun generateAIActions(enemy : GameUnit) : AIAction{
-        val actions = AI.attackPhase(currentEnemy, parent)
+        val actions = AI.attackPhase(enemy, parent)
         actions.sort { a1, a2 ->  val v1 = a1.calculateValue(); val v2 = a2.calculateValue(); if(v1 > v2) -1 else if (v2 > v1) 1 else 0}
         return actions.first()
     }
 
     override fun onEnter() {
         currentEnemy = enemyIter.next()
+        parent.camController.unit = currentEnemy
         currentActions = generateAIActions(currentEnemy)
         currentActions.begin(currentEnemy, parent)
     }

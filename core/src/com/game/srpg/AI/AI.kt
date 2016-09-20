@@ -19,10 +19,11 @@ class AI{
             val possible = map.path.movableRegion(unit.mapX(), unit.mapY(), unit.stats.current.move)
             val weapon = unit.inventory.equipped
             val attacks = Array<AIAction>()
+            attacks.add(NothingAction())
             if(weapon is Item.Weapon){
                 val attackRegion = map.path.attackRegion(map, possible, UnitType.ALLY, weapon)
                 for(pair in attackRegion){
-                    val enemy = map.getUnit(pair.key, { it.unitClass.type == UnitType.ALLY })
+                    val enemy = map.getUnit(pair.key, { it.unitClass.type == UnitType.ALLY && !it.dead })
                     if(enemy != null) {
                         val possibilities = weapon.range.unfilteredEligibleSquares(map, enemy.mapX(), enemy.mapY())
                         for(possibility in possibilities){
@@ -33,6 +34,7 @@ class AI{
                                 val action = AIMove(unit.mapX(), unit.mapY(), x, y)
                                 val attack = AIFastAttack(prediction, x, y)
                                 attacks.add(SequenceAction(unit, map, action, attack))
+                                //attacks.add(action)
                             }
                         }
                     }

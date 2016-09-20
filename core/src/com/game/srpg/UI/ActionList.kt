@@ -22,42 +22,12 @@ class ActionList(skin : Skin,
                  val cursor : Cursor,
                  previous : CursorAction,
                  x : Float,
-                 y : Float) : ActionListener{
-    val list = List<CursorAction>(skin)
+                 y : Float) : KeyListenerList<CursorAction>(skin){
     val container = ScrollPane(list, skin)
-
     var changed = false
 
-    fun activated(action : CursorAction){
-        cursor.switch(action)
-    }
-
-    fun moveDown(){
-        list.items.size
-        list.selectedIndex =
-                if(list.selectedIndex + 1 < list.items.size)
-                    list.selectedIndex + 1
-                else
-                    0
-    }
-
-    fun moveUp(){
-        list.selectedIndex =
-                if(list.selectedIndex - 1 >= 0)
-                    list.selectedIndex - 1
-                else
-                    list.items.size - 1
-    }
-
-    override fun keyDown(input : Actions) : Boolean{
-
-        when(input){
-            Actions.DOWN -> moveDown()
-            Actions.UP -> moveUp()
-            Actions.ACTIVATE -> activated(list.selected)
-        }
-
-        return false
+    override fun activate(item: CursorAction) {
+        cursor.switch(item)
     }
 
     init{
@@ -69,22 +39,5 @@ class ActionList(skin : Skin,
         container.setPosition(x.toFloat(), y.toFloat())
         //list.setItems(DefaultAction(cursor))
         //list.setItems("Move", "Item", "End")
-
-        list.addListener(object: InputListener(){
-            override fun touchDown(event : InputEvent, x : Float, y : Float, point : Int, button : Int) : Boolean {
-                if(!changed){
-                    val action = list.selected
-                    activated(action)
-                }
-                changed = false
-                return true
-            }
-        })
-
-        list.addListener(object: ChangeListener(){
-            override fun changed(event : ChangeEvent, actor: Actor){
-                changed = true
-            }
-        })
     }
 }

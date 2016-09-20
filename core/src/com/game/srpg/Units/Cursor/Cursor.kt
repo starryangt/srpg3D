@@ -3,6 +3,8 @@ package com.game.srpg.Units.Cursor
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.game.srpg.GlobalSystems.ActionListener
 import com.game.srpg.GlobalSystems.Actions
+import com.game.srpg.GlobalSystems.Globals
+import com.game.srpg.GlobalSystems.HasController
 import com.game.srpg.Map.GameMap
 import com.game.srpg.Map.MapCoordinates
 import com.game.srpg.Units.Components.StaticCardComponent
@@ -18,7 +20,7 @@ import java.util.*
 class Cursor(val parent : GameMap,
              masterAtlas : TextureAtlas,
              var x : Int = 0,
-             var y : Int = 0) : MapCoordinates, ActionListener {
+             var y : Int = 0) : MapCoordinates, ActionListener, HasController {
 
     enum class Direction {UP, DOWN, LEFT, RIGHT}
 
@@ -63,6 +65,10 @@ class Cursor(val parent : GameMap,
         return y
     }
 
+    override fun getActiveController(): UnitWorldController {
+        return controllers.peekFirst()
+    }
+
     fun moved(x : Int, y : Int){
         //parent.playerHighlight.setTile(parent.path.pointToIndex(x, y))
         action.moved(x, y)
@@ -84,7 +90,7 @@ class Cursor(val parent : GameMap,
     }
 
     fun moveCommand(oldX : Int, oldY : Int,  newX : Int, newY : Int){
-        moveAnimationCache.set(oldX, oldY, newX, newY, 0.125f, 32f)
+        moveAnimationCache.set(oldX, oldY, newX, newY, Globals.CursorMoveTime, 32f)
         controllers.addFirst(moveAnimationCache)
         disable = true
     }
@@ -101,6 +107,7 @@ class Cursor(val parent : GameMap,
 
     fun lightSwitch(newState: CursorAction){
         action = newState
+        action.onEnter()
     }
 
     fun cancel(){

@@ -13,19 +13,24 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Vector3
+import com.game.srpg.GlobalSystems.Globals
 
 /**
  * Created by FlyingJam on 8/5/2016.
  */
 
-class DirectionalLight(assetManager : AssetManager, position : Vector3, val direction : Vector3) : SLight(assetManager){
+class DirectionalLight(assetManager : AssetManager, position : Vector3, val direction : Vector3) : ShLight(assetManager){
 
     init{
         this.position = position
         init()
     }
 
-    val frameBuffer = FrameBuffer(Pixmap.Format.RGB888, shadowQuality, shadowQuality, true)
+    val frameBuffer = FrameBuffer(
+            Pixmap.Format.RGB888,
+            Globals.Shadow.ShadowMapWidth,
+            Globals.Shadow.ShadowMapHeight,
+            true)
     var depthMap : Texture? = null
 
 
@@ -46,9 +51,12 @@ class DirectionalLight(assetManager : AssetManager, position : Vector3, val dire
 
     override fun init() {
         super.init()
-        camera = PerspectiveCamera(120f, 1024f, 1024f)
+        camera = PerspectiveCamera(
+                Globals.Shadow.LightDirectionalDefaultFOV,
+                Globals.Shadow.LightCameraWidth,
+                Globals.Shadow.LightCameraHeight)
         camera.near = 1f
-        camera.far = 500f
+        camera.far = Globals.Shadow.LightDefaultFar
         camera.position.set(position)
         camera.lookAt(direction)
         camera.update()

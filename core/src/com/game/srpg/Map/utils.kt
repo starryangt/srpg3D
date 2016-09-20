@@ -41,7 +41,6 @@ fun createMapColor(width : Int, height : Int, tileWidth : Int, tileHeight : Int)
     val blue = Color(.46f, .61f, .79f, 1f)
     val red = Color(1f, .41f, .38f, 1f)
     val mat = Material(
-            ColorAttribute.createDiffuse(Color.CYAN),
             BlendingAttribute(true, 0.5f),
             HighlightAttribute(blue, red, blue)
     )

@@ -19,7 +19,7 @@ uniform vec4 u_color;
 
 
 varying vec2 v_texCoords0;
-varying float v_intensity;
+varying vec4 v_color;
 
 void main()
 {
@@ -28,7 +28,7 @@ void main()
 	if(finalColor.a < 0.3){
 	    discard;
 	}
-	finalColor.rgb  *= v_intensity;
+	//finalColor.rgb  *= v_intensity;
 
 	vec2 c = gl_FragCoord.xy;
 	c.x /= u_width;
@@ -36,8 +36,7 @@ void main()
 
 	vec4 color = texture2D(u_shadows, c);
 	finalColor.rgb *= color.z;
-	//finalColor.rgb += color.z * 0.00001;
-
-    gl_FragColor    = finalColor;
+	//finalColor.rgb += color.z * 0.01;
+    gl_FragColor    = finalColor * v_color;
 }
 

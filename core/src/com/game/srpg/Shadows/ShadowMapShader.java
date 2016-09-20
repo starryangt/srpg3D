@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class ShadowMapShader extends BaseShader
 {
 	public Renderable	renderable;
-	private ArrayList<SLight> lights;
+	private ArrayList<ShLight> lights;
 
 	@Override
 	public void end()
@@ -29,7 +29,7 @@ public class ShadowMapShader extends BaseShader
 		super.end();
 	}
 
-	public ShadowMapShader(final Renderable renderable, final ShaderProgram shaderProgramModelBorder, final ArrayList<SLight> light)
+	public ShadowMapShader(final Renderable renderable, final ShaderProgram shaderProgramModelBorder, final ArrayList<ShLight> light)
 	{
 		this.renderable = renderable;
 		this.program = shaderProgramModelBorder;
@@ -45,7 +45,7 @@ public class ShadowMapShader extends BaseShader
 	public void begin(final Camera camera, final RenderContext context)
 	{
 		super.begin(camera, context);
-		context.setDepthTest(GL20.GL_LEQUAL);
+		context.setDepthTest(GL20.GL_DEPTH_TEST);
 		context.setCullFace(GL20.GL_BACK);
 	}
 
@@ -89,7 +89,7 @@ public class ShadowMapShader extends BaseShader
 	public void render(final Renderable renderable, final Attributes combinedAttributes)
 	{
 		boolean firstCall = true;
-		for(final SLight light : lights){
+		for(final ShLight light : lights){
 			light.applyToShader(program);
 			if(firstCall){
 				context.setDepthTest(GL20.GL_LEQUAL);
@@ -101,8 +101,6 @@ public class ShadowMapShader extends BaseShader
 				context.setDepthTest(GL20.GL_EQUAL);
 				context.setBlending(true, GL20.GL_ONE, GL20.GL_ONE);
 				renderable.meshPart.mesh.render(program, renderable.meshPart.primitiveType, renderable.meshPart.offset, renderable.meshPart.size, false);
-				//super.render(renderable, combinedAttributes);
-				//renderable.meshPart.render(program);
 			}
 
 		}

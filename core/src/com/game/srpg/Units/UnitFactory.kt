@@ -24,13 +24,20 @@ class UnitFactory{
             val texture = assets.masterAtlas.findRegion("fe").texture
             val frames = getFrames(texture, 64, 64, 4)
             val animation = Animation(0.3f, frames, Animation.PlayMode.LOOP_PINGPONG)
-            val actions = ActionComponent(::AttackAction, ::EndAction)
+            val actions = ActionComponent(::AttackAction, ::InventoryAction, ::EndAction)
             val dict = assets.animationDictionary.get("marth")
             val animationDict = dict ?: hashMapOf(Pair("idle", animation))
             val unit = GameUnit(x, y, "TestUnit", MapController(map), StatComponent(Stats(speed = 20, strength = 5)), AnimationComponent(animation, animationDict), ClassComponent(), actions)
             val weapon = WeaponFactory.TestSword()
             unit.inventory.add(weapon)
             unit.inventory.equip(0)
+            unit.inventory.add(WeaponFactory.OtherSword())
+            unit.inventory.add(WeaponFactory.TestSword())
+            unit.inventory.add(WeaponFactory.OtherSword())
+            unit.inventory.add(WeaponFactory.TestSword())
+            unit.inventory.add(WeaponFactory.OtherSword())
+            unit.inventory.add(WeaponFactory.TestSword())
+            unit.inventory.add(WeaponFactory.OtherSword())
             return unit
         }
 
@@ -38,7 +45,8 @@ class UnitFactory{
             val texture = assets.masterAtlas.findRegion("fe").texture
             val frames = getFrames(texture, 64, 64, 4)
             val animation = Animation(0.6f, frames, Animation.PlayMode.LOOP_RANDOM)
-            val dict = hashMapOf(Pair("idle", animation))
+            val dict = assets.animationDictionary.get("marth") ?: hashMapOf(Pair("idle", animation))
+            //val dict = hashMapOf(Pair("idle", animation))
             val unit = GameUnit(x, y, "TestEnemy", MapController(map), StatComponent(Stats(health = 15, strength = 4, speed = 10)), AnimationComponent(animation, dict), ClassComponent(UnitType.ENEMY), ActionComponent())
             unit.inventory.add(WeaponFactory.TestSword())
             unit.inventory.equip(0)

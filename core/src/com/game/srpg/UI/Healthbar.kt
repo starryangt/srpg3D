@@ -22,7 +22,7 @@ open class HealthChange : Action(), Ends {
     var oldValue = 0f
     var timeAccumulator = 0f
     var time = 1f
-    var interop = Interpolation.circleOut
+    var interop = Interpolation.exp5Out
 
     var ended = false
 
@@ -52,7 +52,7 @@ open class HealthChange : Action(), Ends {
                 ended = true
                 return true
             }
-            val new = act.value.toInt()
+            val new = Math.ceil(act.value.toDouble()).toInt()
             if(previous != new){
                 act.changed(new)
             }

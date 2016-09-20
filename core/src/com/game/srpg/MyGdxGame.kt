@@ -5,12 +5,15 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader
 import com.badlogic.gdx.assets.loaders.SkinLoader
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g3d.Model
+import com.badlogic.gdx.graphics.g3d.particles.ParticleEffect
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.game.srpg.GlobalSystems.*
@@ -42,17 +45,20 @@ class MyGdxGame : Game() {
             it.load("shadow_c", ShaderProgram::class.java, ShaderParamater())
             it.load("shadow_t", ShaderProgram::class.java, ShaderParamater())
             it.load("shadowed_scene_c", ShaderProgram::class.java, ShaderParamater())
+            it.load("shadowed_scene_vc", ShaderProgram::class.java, ShaderParamater())
             it.load("shadowed_scene_t", ShaderProgram::class.java, ShaderParamater())
             it.load("uiskin.atlas", TextureAtlas::class.java)
+            it.load("tree.g3dj", Model::class.java)
+            it.load("Texture.png", Texture::class.java)
             it.load("uiskin.json", Skin::class.java, SkinLoader.SkinParameter("uiskin.atlas"))
         }
         requests.add(TexturePiece("fe.png", "fe"))
         requests.add(TexturePiece("cursor.png", "cursor"))
         requests.add(AnimationRequest("marth", "idle", 4, Animation.PlayMode.LOOP_PINGPONG, .17f))
-        requests.add(AnimationRequest("marth", "up", 6, Animation.PlayMode.LOOP_PINGPONG, .2f))
-        requests.add(AnimationRequest("marth", "right", 6, Animation.PlayMode.LOOP_PINGPONG, .2f))
-        requests.add(AnimationRequest("marth", "left", 6, Animation.PlayMode.LOOP_PINGPONG, .2f))
-        //requests.add(AnimationRequest("marth", "up", 6, Animation.PlayMode.LOOP_PINGPONG, .2f))
+        requests.add(AnimationRequest("marth", "up", 6, Animation.PlayMode.LOOP, .2f))
+        requests.add(AnimationRequest("marth", "right", 6, Animation.PlayMode.LOOP, .2f, true))
+        requests.add(AnimationRequest("marth", "left", 6, Animation.PlayMode.LOOP, .2f))
+        requests.add(AnimationRequest("marth", "down", 6, Animation.PlayMode.LOOP, .2f))
         screen = LoadScreen(this, requests, ::MapScreen)
     }
 

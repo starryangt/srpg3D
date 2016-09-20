@@ -7,6 +7,7 @@ import com.game.srpg.Units.Components.CardDrawingComponent
 import com.game.srpg.Units.GameUnit
 
 import com.badlogic.gdx.utils.Array
+import com.game.srpg.Map.MapHighlight
 import com.game.srpg.Units.Cursor.DefaultAction
 import com.game.srpg.Units.Cursor.NullAction
 
@@ -36,6 +37,8 @@ class PlayerPhase(map : GameMap) : Phase(map){
     }
 
     override fun onEnter() {
+
+        parent.camController.unit = parent.cursor
         players = parent.getAllies()
         addListener(parent.cursor)
         val draw = parent.cursor.drawing
@@ -46,6 +49,14 @@ class PlayerPhase(map : GameMap) : Phase(map){
         for(player in players){
             player.enable()
         }
+
+        val regions = parent.path.totalAttackRegion(parent)
+        val high = parent.totalEnemyHighlight
+        high.begin()
+        for(tile in regions.entries()){
+            high.colorTile(tile.key, MapHighlight.Type.ATTACK)
+        }
+        high.end()
     }
 
     override fun onExit() {

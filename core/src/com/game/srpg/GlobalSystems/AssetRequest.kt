@@ -20,6 +20,12 @@ class AssetRequest(){
     val lateRequest = Array<(AssetManager, TextureAtlas) -> Unit>()
     val animRequest = Array<AnimationRequest>()
 
+    val empty = Pixmap(1, 1, Pixmap.Format.RGB565)
+    init{
+        empty.setColor(.5f, .5f, .5f, 1f)
+        empty.drawPixel(1, 1)
+    }
+
     fun add(request : (AssetManager) -> Unit){
         requests.add(request)
     }

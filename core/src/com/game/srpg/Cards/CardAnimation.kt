@@ -24,12 +24,20 @@ class CardAnimation(var animation : Animation, width : Float = 32f, height : Flo
     var time = 0f
     var lock = false
 
+    var stop = false
+
+    fun pause(state : Boolean){
+        stop = state
+    }
+
     fun update(dt : Float){
-        lock = true
-        time += dt
-        val frame = animation.getKeyFrame(time)
-        card.switch(frame)
-        lock = false
+        if(!stop) {
+            lock = true
+            time += dt
+            val frame = animation.getKeyFrame(time)
+            card.switch(frame)
+            lock = false
+        }
     }
 
     fun switch(newAnimation: Animation){

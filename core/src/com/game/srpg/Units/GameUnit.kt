@@ -1,11 +1,10 @@
 package com.game.srpg.Units
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.maps.MapObject
+import com.game.srpg.GlobalSystems.HasController
 import com.game.srpg.Map.MapCoordinates
-import com.game.srpg.Units.Components.ActionComponent
-import com.game.srpg.Units.Components.ClassComponent
-import com.game.srpg.Units.Components.DrawingComponent
-import com.game.srpg.Units.Components.StatComponent
+import com.game.srpg.Units.Components.*
 import com.game.srpg.Units.Controller.MapController
 import com.game.srpg.Units.Controller.UnitWorldController
 import com.game.srpg.Units.Items.Inventory
@@ -22,12 +21,13 @@ class GameUnit(var x : Int,
                val stats : StatComponent,
                val drawing : DrawingComponent,
                val unitClass : ClassComponent,
-               val actions : ActionComponent) : MapCoordinates{
+               val actions : ActionComponent) : HasController{
 
     val controllers = ArrayDeque<UnitWorldController>()
     val inventory = Inventory()
 
     var enabled = true
+    var dead = false
 
     init{
         controllers.addFirst(controller)
@@ -38,16 +38,18 @@ class GameUnit(var x : Int,
     }
 
     fun popController(){
-        if(controllers.size >= 1) {
+        if(controllers.size > 1) {
             controllers.removeFirst()
         }
     }
 
     fun disable(){
+        drawing.requestColor(Color(0.3f, 0.3f, 0.3f, 1.0f))
         enabled = false
     }
 
     fun enable(){
+        drawing.requestColor(Color(1f, 1f, 1f, 1f))
         enabled = true
     }
 
@@ -59,8 +61,12 @@ class GameUnit(var x : Int,
         return y
     }
 
+    override fun getActiveController(): UnitWorldController {
+        return controllers.peekFirst()
+    }
+
     fun update(dt : Float){
-        val controller = controllers.peekFirst()
+        val controller = getActiveController()
         controller.update(dt)
         drawing.update(dt, this)
         drawing.apply(this)

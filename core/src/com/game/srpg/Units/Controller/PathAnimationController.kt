@@ -21,12 +21,13 @@ class PathAnimationController(
         ) : UnitWorldController(), Ends {
 
     val originalPos = Vector2()
+    val originalMapPos = Vector2()
     val goalPos = Vector2()
     val screenCoordinates = Vector2()
 
     var index = 2
     var timeAccumulator = 0f
-    var direction = "down"
+    var direction = "idle"
 
     var done = false
 
@@ -51,7 +52,7 @@ class PathAnimationController(
         goalPos.x = map.mapToWorldX(x, 32)
         goalPos.y = map.mapToWorldY(y, 0)
         val xDiff = goalPos.x - originalPos.x
-        val yDiff = goalPos.y - originalPos.y
+        val yDiff = -1 * (goalPos.y - originalPos.y)
         val newDirection =
                 if(xDiff > 0){
                     "right"

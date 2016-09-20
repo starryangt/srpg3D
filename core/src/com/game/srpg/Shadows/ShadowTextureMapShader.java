@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class ShadowTextureMapShader extends BaseShader
 {
 	public Renderable	renderable;
-	private ArrayList<SLight> lights;
+	private ArrayList<ShLight> lights;
 
 	@Override
 	public void end()
@@ -29,7 +29,7 @@ public class ShadowTextureMapShader extends BaseShader
 		super.end();
 	}
 
-	public ShadowTextureMapShader(final Renderable renderable, final ShaderProgram shaderProgramModelBorder, final ArrayList<SLight> light)
+	public ShadowTextureMapShader(final Renderable renderable, final ShaderProgram shaderProgramModelBorder, final ArrayList<ShLight> light)
 	{
 		this.renderable = renderable;
 		this.program = shaderProgramModelBorder;
@@ -88,7 +88,7 @@ public class ShadowTextureMapShader extends BaseShader
 	public void render(final Renderable renderable, final Attributes combinedAttributes)
 	{
 		boolean firstCall = true;
-		for(final SLight light : lights){
+		for(final ShLight light : lights){
 			light.applyToShader(program);
 			if(firstCall){
 				context.setDepthTest(GL20.GL_LEQUAL);

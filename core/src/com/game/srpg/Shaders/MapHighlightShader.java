@@ -102,7 +102,12 @@ public class MapHighlightShader extends BaseShader
     @Override
     public boolean canRender(final Renderable instance)
     {
-        return instance.material.has(ColorAttribute.Diffuse);
+        if(instance.userData instanceof MapHighlight){
+            if (instance.userData == mapHighlight) {
+                return true;
+            }
+        }
+        return false;//instance.material.has(HighlightAttribute.Highlight);
     }
 
     @Override

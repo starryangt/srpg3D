@@ -1,9 +1,11 @@
 package com.game.srpg.AI.Action
 
+import com.game.srpg.GlobalSystems.Globals
 import com.game.srpg.GlobalSystems.ParallelStartEnd
 import com.game.srpg.Map.GameMap
 import com.game.srpg.Units.Controller.MoveAnimationController
 import com.game.srpg.Units.Controller.PathAnimationController
+import com.game.srpg.Units.Controller.UnitWorldController
 import com.game.srpg.Units.GameUnit
 
 /**
@@ -13,6 +15,7 @@ import com.game.srpg.Units.GameUnit
 class AIMove(val oldX : Int = 0, val oldY : Int = 0, val newX : Int = 0, val newY : Int = 0) : ChainableAction(){
 
     val pair = ParallelStartEnd()
+    var anim : UnitWorldController? = null
 
     override fun end(unit: GameUnit, map: GameMap) {
         unit.popController()
@@ -23,15 +26,15 @@ class AIMove(val oldX : Int = 0, val oldY : Int = 0, val newX : Int = 0, val new
 
     override fun begin(unit: GameUnit, map: GameMap) {
         val path = map.path.pathfind(oldX, oldY, newX, newY)
-        val animation = PathAnimationController(path, unit.drawing, map)
+        val animation = PathAnimationController(path, unit.drawing, map, Globals.UnitMoveTime)
+        anim = animation
         unit.addController(animation)
-        pair.add(animation)
     }
 
     override fun calculateValue(): Float {
         var value = 0f
         val dist = Math.abs(oldX - newX) + Math.abs(oldY - newY)
-        value += dist * AIFactors.PerUnitMoved
+        value += -dist * Globals.AIFactors.PerUnitMoved
         return value
     }
 
@@ -39,6 +42,6 @@ class AIMove(val oldX : Int = 0, val oldY : Int = 0, val newX : Int = 0, val new
     }
 
     override fun hasEnded(): Boolean {
-        return pair.hasEnded()
+        return anim?.isDone() ?: false
     }
 }

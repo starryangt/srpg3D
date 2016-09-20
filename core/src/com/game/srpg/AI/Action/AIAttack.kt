@@ -1,9 +1,7 @@
 package com.game.srpg.AI.Action
 
 import com.game.srpg.Combat.Prediction
-import com.game.srpg.GlobalSystems.AttackProcess
-import com.game.srpg.GlobalSystems.ParallelStartEnd
-import com.game.srpg.GlobalSystems.StartEnd
+import com.game.srpg.GlobalSystems.*
 import com.game.srpg.Map.GameMap
 import com.game.srpg.Units.Controller.AttackAnimationController
 import com.game.srpg.Units.Controller.PathAnimationController
@@ -25,10 +23,10 @@ abstract class AIAttack(val prediction: Prediction, val x : Int, val y : Int) : 
     override fun calculateValue(): Float {
         var value = 0f
         if(kill){
-            value += AIFactors.Kill
+            value += Globals.AIFactors.Kill
         }
-        value += prediction.attackerInfo.damage * AIFactors.PerDamage
-        value += length * AIFactors.PerUnitMoved
+        value += prediction.attackerInfo.damage * Globals.AIFactors.PerDamage
+        value += length * Globals.AIFactors.PerUnitMoved
         return value
     }
 
@@ -39,14 +37,29 @@ abstract class AIAttack(val prediction: Prediction, val x : Int, val y : Int) : 
 
 class AIFastAttack(prediction: Prediction, x: Int, y: Int) : AIAttack(prediction, x, y){
 
-
     internal lateinit var attack : AttackProcess
+    var death : DeathProcess? = null
+
+    var ended = false
     override fun update(dt: Float) {
-        attack.update(dt)
+        if(!attack.hasEnded())
+            attack.update(dt)
+        death?.update(dt)
     }
 
     override fun begin(unit: GameUnit, map: GameMap) {
-        attack = AttackProcess(map, unit, prediction.defender)
+        attack = AttackProcess(map, prediction.attacker, prediction.defender)
+        attack.doneCallback {
+            val deadUnit = attack.deadUnits()
+            if(deadUnit != null){
+                val dead = DeathProcess(deadUnit, Globals.DeathFadeTime)
+                dead.end.add { super.end(unit, map); ended = true }
+                death = dead
+            }
+            else{
+                ended = true
+            }
+        }
     }
 
     override fun end(unit: GameUnit, map: GameMap) {
@@ -55,6 +68,6 @@ class AIFastAttack(prediction: Prediction, x: Int, y: Int) : AIAttack(prediction
     }
 
     override fun hasEnded(): Boolean {
-        return attack.hasEnded()
+        return ended
     }
 }

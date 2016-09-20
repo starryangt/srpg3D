@@ -30,6 +30,9 @@ class AttackInstance(
 class CombatReport(val attacker : GameUnit, val defender : GameUnit, vararg attack : AttackInstance){
     val attacks = attack.toMutableList()
 
+    val attackerHealth = attacker.stats.current.health
+    val defenderHealth = defender.stats.current.health
+
     fun applyToUnits(){
         for(attack in attacks){
             attack.apply()
@@ -44,17 +47,16 @@ class CombatReport(val attacker : GameUnit, val defender : GameUnit, vararg atta
         return attacks.filter { it.attacker == attacker }.sumBy { it.damage }
     }
 
-
     fun defenderDamage() : Int{
         return attacks.filter { it.attacker == defender }.sumBy { it.damage }
     }
 
     fun defenderDead() : Boolean{
-        return attackerDamage() >= defender.stats.current.health
+        return attackerDamage() >= defenderHealth
     }
 
     fun attackerDead() : Boolean{
-        return defenderDamage() >= attacker.stats.current.health
+        return defenderDamage() >= attackerHealth
     }
 
     fun queryDead(a: GameUnit, d: GameUnit) : Boolean{

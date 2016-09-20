@@ -31,8 +31,21 @@ class AttackProcess(val map : GameMap, val attacker : GameUnit, val defender : G
 
     var done = false
 
+    init{
+        println(report)
+    }
+
+    fun deadUnits() : GameUnit?{
+        if(report.defenderDead())
+            return report.defender
+        else if (report.attackerDead())
+            return report.attacker
+
+        return null
+    }
+
     fun update(dt : Float){
-        if(pair.hasEnded() && attackIter.hasNext()){
+        if(pair.hasEnded() && attackIter.hasNext() && !done){
             currentInstance.attacker.popController()
             currentInstance.defender.stats.current.health -= currentInstance.damage
             currentInstance = attackIter.next()
