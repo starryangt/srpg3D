@@ -1,0 +1,1 @@
+{width:10,height:10,tileWidth:32,tileHeight:32,walls:[80,81,82,83,84,85,86,87,88,89],instances:[{model:models/tree.g3dj,position:{x:18.459486,y:-5,z:-269.84253}},{model:models/tree.g3dj,position:{x:16,y:-5.0000153,z:-16}},{model:models/tree.g3dj,position:{x:304,y:-5,z:-16}},{model:models/tree.g3dj,position:{x:304,y:-5,z:-272}}]}

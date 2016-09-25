@@ -1,5 +1,6 @@
 package com.game.srpg.Map
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.VertexAttributes
@@ -15,6 +16,7 @@ import com.badlogic.gdx.math.Vector3
 import com.game.srpg.Units.Cursor.Cursor
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.Pool
 import com.game.srpg.Cards.CardBatch
 import com.game.srpg.GlobalSystems.AssetWrapper
@@ -65,9 +67,31 @@ class GameMap(width : Int,
               val ui : UI,
               val screen : MapScreen) : Map(width, height), Disposable {
 
+    companion object static{
+        fun fromJson(filename : String, assets : AssetWrapper, ui : UI, screen : MapScreen) : GameMap{
+            val fh = Gdx.files.internal(filename)
+            val string = fh.readString()
+            val json = Json()
+            val info = json.fromJson(MapInformation::class.java, string)
+            val map = GameMap(info.width, info.height, info.tileWidth, info.tileHeight, assets, ui, screen)
+            for(wall in info.walls){
+                map.path.setWall(wall)
+            }
+
+            map.models.loadModel(assets.assetManager.get("tree.g3dj"), "models/tree.g3dj")
+            for(instance in info.instances){
+                map.models.addInstance(instance.model, instance.position, instance.rotation)
+            }
+            map.models.buildCache()
+            return map
+        }
+    }
+
+
     val masterAtlas = assets.masterAtlas
     val manager = assets.assetManager
     val cursor = Cursor(this, masterAtlas)
+    val models = MapGeometry()
     val camController = UnitCameraFollower(cursor, screen.camera, screen.width, screen.height)
     val units = Array<GameUnit>()
     val unitIter = Array.ArrayIterator(units)

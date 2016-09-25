@@ -55,7 +55,7 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter() {
     val controller = CameraInputController(camera)
     val skin = assets.assetManager.get("uiskin.json", Skin::class.java)
     val ui = UI(skin)
-    val map = GameMap(32, 32, 32, 32, assets, ui, this)
+    val map = GameMap.fromJson("forest.json", assets, ui, this)//GameMap(32, 32, 32, 32, assets, ui, this)
     val shadow = Shadow(assets, camera)
 
     val spotlight = DirectionalLight(assets.assetManager, Vector3(0f, 300f, 300f), Vector3(0f, 0f, 0f))
@@ -80,14 +80,10 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter() {
 
     val normalBatch = ModelBatch()
 
-    val model = assets.assetManager.get("tree.g3dj", Model::class.java)
-    val instance = ModelInstance(model)
-
     val button = Button(skin)
     val action = MoveToAction()
 
     init {
-        instance.transform.translate(64f, 0f, 0f)
         //instance.transform()
     }
 
@@ -97,7 +93,6 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter() {
         action.setPosition(table.table.x, table.table.y)
         action.duration = .2f
         table.table.x -= table.table.width
-
         table.table.addAction(action)
     }
 
@@ -145,7 +140,7 @@ class MapScreen(val game : Game, val assets : AssetWrapper) : ScreenAdapter() {
 
         shadow.render {
             it.render(map.shadowedRenderables)
-            it.render(instance)
+            it.render(map.models)
             //it.render(instance) }
         }
 
