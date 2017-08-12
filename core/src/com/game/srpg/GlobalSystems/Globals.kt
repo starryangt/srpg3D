@@ -15,14 +15,14 @@ class Globals{
 
     class Shadow{
         companion object static{
-            val LightCameraWidth = 1024f
-            val LightCameraHeight = 1024f
+            val LightCameraWidth = 2048f
+            val LightCameraHeight = 2048f
             val LightDirectionalDefaultFOV = 120f
             val LightPointDefaultFOV = 90f
             val LightDefaultFar = 500f
 
-            val ShadowMapWidth = 1024
-            val ShadowMapHeight = 1024
+            val ShadowMapWidth = 4096
+            val ShadowMapHeight = 4096
         }
 
     }
