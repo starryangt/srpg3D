@@ -65,8 +65,8 @@ build/
 
 ## Binary resources
 
-*.png
-*.g3dj
-*.g3db
-snowparttest
+#*.png
+#*.g3dj
+#*.g3db
+#snowparttest
 
